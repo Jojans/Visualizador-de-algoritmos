@@ -1,6 +1,34 @@
 let currentArray = [];
 let currentAlgorithm = "";
 
+// Diccionario con información de cada algoritmo
+const algorithmInfo = {
+    bubbleSort: {
+        description: "Compara repetidamente elementos adyacentes y los intercambia si están en el orden incorrecto.",
+        complexity: "O(n²) en el peor y promedio caso, O(n) en el mejor caso (array ordenado).",
+    },
+    insertionSort: {
+        description: "Construye la lista ordenada de un elemento a la vez, insertando en la posición correcta.",
+        complexity: "O(n²) en el peor caso, O(n) en el mejor caso.",
+    }
+};
+
+// Cargar la información adicional de cada algoritmo
+document.getElementById("algorithmSelect").addEventListener("change", function() {
+    const selected = this.value;
+    const infoDiv = document.getElementById("algorithm-info");
+
+    if (algorithmInfo[selected]) {
+    const algo = algorithmInfo[selected];
+        infoDiv.innerHTML = `
+            <p>${algo.description}</p>
+            <p><strong>${algo.complexity}</strong></p>
+        `;
+    } else {
+        infoDiv.innerHTML = "";
+    }
+});
+
 // Al cargar la página, recupera datos guardados o genera nuevos
 window.onload = () => {
     const savedArray = loadArray(); // de utils.js
