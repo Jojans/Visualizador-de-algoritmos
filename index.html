@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Algoritmos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Visualizador de Algoritmos</h1>
+
+    <div class="controls">
+        <select id="algorithmSelect">
+            <option value="">-- Selecciona un algoritmo --</option>
+            <optgroup label="Ordenamiento">
+                <option value="bubbleSort">Bubble Sort</option>
+                <option value="insertionSort">Insertion Sort</option>
+                <option value="selectionSort">Selection Sort</option>
+                <option value="quickSort">Quick Sort</option>
+                <option value="mergeSort">Merge Sort</option>
+                <option value="heapSort">Heap Sort</option>
+            </optgroup>
+            <optgroup label="Búsqueda">
+                <option value="linearSearch">Búsqueda Secuencial</option>
+                <option value="binarySearch">Búsqueda Binaria</option>
+                <option value="bfs">BFS</option>
+                <option value="dfs">DFS</option>
+            </optgroup>
+            <optgroup label="Otros">
+                <option value="dijkstra">Dijkstra</option>
+                <option value="aStar">A*</option>
+                <option value="hanoi">Torres de Hanoi</option>
+                <option value="pathfinding">Pathfinding</option>
+            </optgroup>
+        </select>
+
+        <button id="generate">Generar Datos</button>
+        <button id="start">Iniciar</button>
+    </div>
+
+    <div id="arrayContainer"></div>
+
+    <script src="utils.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

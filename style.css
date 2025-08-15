@@ -1,0 +1,46 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.controls {
+    margin: 20px;
+}
+
+select, button {
+    padding: 10px;
+    margin: 5px;
+}
+
+#arrayContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.array-item {
+    background-color: steelblue;
+    color: white;
+    padding: 15px;
+    border-radius: 12px; /* Bordes redondeados */
+    font-size: 18px;
+    width: 40px;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Sombra ligera */
+}
+
+.array-item:hover {
+    transform: scale(1.1); /* Animación al pasar el mouse */
+}
+
+.highlight {
+    background-color: crimson !important;
+}
+
+.finished {
+    background-color: #4CAF50 !important; /* Verde amigable */
+}
