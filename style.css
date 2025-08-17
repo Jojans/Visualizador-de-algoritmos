@@ -1,0 +1,48 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.controls {
+    margin: 20px;
+}
+
+select, button {
+    padding: 10px;
+    margin: 5px;
+}
+
+#arrayContainer {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.array-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: black;
+    background-color: lightblue;
+    transition: background-color 0.3s ease;
+}
+
+.array-item:hover {
+    transform: scale(1.1); /* Animación al pasar el mouse */
+}
+
+.highlight {
+    background-color: crimson !important;
+}
+
+.finished {
+    background-color: #4CAF50 !important; /* Verde amigable */
+}
