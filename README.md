@@ -30,14 +30,3 @@ Este visualizador permite comprender cómo funcionan los algoritmos paso a paso 
   - Peor caso  
 
 - 🗂 **Persistencia de datos**: los arrays generados se guardan en memoria para reutilización.
-
----
-
-## 🖥️ Vista previa
-
-- Generación de datos aleatorios para ordenar.  
-- Animación paso a paso de cada algoritmo.  
-- Información teórica de cada algoritmo:
-  - Descripción
-  - Complejidad computacional
-- Gráfica comparativa en función del tamaño de entrada.
