@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Visualizador de Algoritmos</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-900 text-white font-sans">
 
@@ -27,18 +29,49 @@
     </a>
   </header>
 
-  <!-- CONTENEDOR -->
-  <section class="max-w-3xl mx-auto py-12 px-6">
-    <h3 class="text-2xl font-bold text-yellow-400 mb-4">Próximamente</h3>
-    <p class="text-gray-300">Aquí podrás visualizar paso a paso cómo trabajan los algoritmos de búsqueda.</p>
+  <!-- CONTROLES -->
+  <section class="py-8 px-4 flex flex-col items-center gap-6">
+    <div class="flex flex-wrap gap-4 justify-center">
+      <select id="algorithmSelect" class="px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white">
+        <option value="linearSearch" selected>Búsqueda Lineal</option>
+        <option value="binarySearch">Búsqueda Binaria</option>
+        <option value="dfs">Depth First Search (DFS)</option>
+        <option value="bfs">Breadth First Search (BFS)</option>
+      </select>
+
+      <button id="generate" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-black font-semibold shadow">
+        Generar Datos
+      </button>
+      <button id="start" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-semibold shadow">
+        Iniciar
+      </button>
+
+      <div class="flex items-center gap-4">
+        <input id="searchValue" type="number" placeholder="Valor a buscar" class="px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white w-40">
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENEDOR DE DATOS -->
+  <div id="arrayContainer" class="flex justify-center mt-6"></div>
+
+  <!-- INFO DEL ALGORITMO -->
+  <section class="max-w-2xl mx-auto mt-8 bg-gray-800 p-6 rounded-xl shadow-lg text-left">
+    <h3 class="text-xl font-bold text-yellow-400 mb-2">Información del algoritmo</h3>
+    <div id="algorithm-info" class="text-gray-300"></div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="py-6 text-center text-gray-400 bg-gray-800">
+  <footer class="py-6 text-center text-gray-400 bg-gray-800 mt-10">
     <p>Desarrollado por <span class="font-semibold">Jojans</span> • 
       <a href="https://github.com/Jojans" class="text-blue-400 hover:underline">GitHub</a>
     </p>
   </footer>
+
+  <!-- JS -->
+  <script src="algorithmsInfo.js"></script>
+  <script src="utils.js"></script>
+  <script src="main.js"></script>
 
 </body>
 </html>

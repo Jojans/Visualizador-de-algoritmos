@@ -1,5 +1,5 @@
 let currentArray = [];
-let currentAlgorithm = "bubbleSort";
+let currentAlgorithm = "";
 let stopExecution = false; // <- bandera global
 
 // Diccionario con información de cada algoritmo
@@ -27,56 +27,118 @@ const algorithmInfo = {
     heapSort: {
         description: "Construye un heap máximo a partir del arreglo y luego extrae repetidamente el mayor elemento para colocarlo en su posición correcta.",
         complexity: "O(n log n) en el peor, promedio y mejor caso.",
+    },
+    linearSearch: {
+        description: "Recorre el arreglo de principio a fin comparando cada elemento con el valor buscado.",
+        complexity: "O(n) en el peor y promedio caso, O(1) en el mejor caso."
+    },
+    binarySearch: {
+        description: "Divide repetidamente el arreglo ordenado en mitades hasta encontrar el valor buscado. Debe estar ordenado.",
+        complexity: "O(log n) en el peor, promedio y mejor caso."
+    },
+    dfs: {
+        description: "Explora un grafo siguiendo un camino tan profundo como sea posible antes de retroceder.",
+        complexity: "O(V + E), donde V es el número de vértices y E el número de aristas."
+    },
+    bfs: {
+        description: "Explora un grafo por niveles, visitando primero todos los vecinos antes de avanzar.",
+        complexity: "O(V + E), donde V es el número de vértices y E el número de aristas."
     }
 };
 
-// Cargar la información adicional de cada algoritmo
-document.getElementById("algorithmSelect").addEventListener("change", function() {
-    stopExecution = true; // <- detener algoritmo en curso
-    const selected = this.value;
-    currentAlgorithm = selected;
+// Detectar página actual y establecer algoritmo por defecto
+document.addEventListener("DOMContentLoaded", () => {
+    const path = window.location.pathname;
 
-    const infoDiv = document.getElementById("algorithm-info");
-    if (algorithmInfo[selected]) {
-        const algo = algorithmInfo[selected];
-        infoDiv.innerHTML = `
+    if (path.includes("ordenamiento")) {
+        currentAlgorithm = "bubbleSort";   // por defecto en ordenamiento
+    } else if (path.includes("busqueda")) {
+        currentAlgorithm = "linearSearch"; // por defecto en búsqueda
+    } else {
+        currentAlgorithm = "";             // en otros, no seleccionamos nada
+    }
+
+    // Forzar el valor en el select si existe
+    const algoSelect = document.getElementById("algorithmSelect");
+    if (algoSelect && currentAlgorithm) {
+        algoSelect.value = currentAlgorithm;
+    }
+
+    // Mostrar info inicial si aplica
+    if (algorithmInfo[currentAlgorithm]) {
+        const algo = algorithmInfo[currentAlgorithm];
+        document.getElementById("algorithm-info").innerHTML = `
             <p>${algo.description}</p>
             <p><strong>${algo.complexity}</strong></p>
         `;
-        updateChart(selected);
-    } else {
-        infoDiv.innerHTML = "";
     }
 });
+
+// Detectar cambios en el select de algoritmos
+const algoSelect = document.getElementById("algorithmSelect");
+if (algoSelect) {
+    algoSelect.addEventListener("change", (e) => {
+        currentAlgorithm = e.target.value;
+
+        if (algorithmInfo[currentAlgorithm]) {
+            const algo = algorithmInfo[currentAlgorithm];
+            document.getElementById("algorithm-info").innerHTML = `
+                <p>${algo.description}</p>
+                <p><strong>${algo.complexity}</strong></p>
+            `;
+        }
+
+        // ✅ Ajustar array según algoritmo seleccionado
+        if (currentAlgorithm === "binarySearch") {
+            // Si ya había array, solo lo ordenamos
+            if (currentArray.length > 0) {
+                currentArray.sort((a, b) => a - b);
+            } else {
+                currentArray = generateArray();
+                currentArray.sort((a, b) => a - b);
+            }
+            saveArray(currentArray);
+            drawArray(currentArray);
+        } 
+        else if (["linearSearch", "bubbleSort", "insertionSort", "selectionSort", "quickSort", "mergeSort", "heapSort"].includes(currentAlgorithm)) {
+            // Solo generar nuevo array si no había
+            if (currentArray.length === 0) {
+                currentArray = generateArray();
+                saveArray(currentArray);
+                drawArray(currentArray);
+            }
+        }
+    });
+}
 
 // Al cargar la página, recupera datos guardados o genera nuevos
 window.onload = () => {
     const savedArray = loadArray(); // de utils.js
     if (savedArray) {
         currentArray = savedArray;
+        // Si es binarySearch -> ordenar el recuperado
+        if (currentAlgorithm === "binarySearch") {
+            currentArray.sort((a, b) => a - b);
+        }
     } else {
         currentArray = generateArray();
+        if (currentAlgorithm === "binarySearch") {
+            currentArray.sort((a, b) => a - b);
+        }
         saveArray(currentArray);
     }
     drawArray(currentArray);
-
-    // Mostrar info de Bubble Sort desde el inicio
-    const infoDiv = document.getElementById("algorithm-info");
-    const algo = algorithmInfo[currentAlgorithm];
-    infoDiv.innerHTML = `
-        <p>${algo.description}</p>
-        <p><strong>${algo.complexity}</strong></p>
-    `;
-    updateChart(currentAlgorithm);
-
-    // Forzar que en el select aparezca Bubble Sort seleccionado
-    document.getElementById("algorithmSelect").value = currentAlgorithm;
 };
 
 // Generar datos iniciales solo si se oprime el botón
 document.getElementById("generate").addEventListener("click", () => {
     stopExecution = true; // <- parar ejecución en curso
     currentArray = generateArray();
+
+    if (currentAlgorithm === "binarySearch") {
+        currentArray.sort((a, b) => a - b);
+    }
+
     saveArray(currentArray);
     drawArray(currentArray);
 });
@@ -88,11 +150,20 @@ document.getElementById("start").addEventListener("click", async () => {
         return;
     }
 
-    stopExecution = true; // <- detener si había uno corriendo
-    await sleep(100);     // pequeña pausa para asegurar que terminó
+    if (window.location.pathname.includes("busqueda")) {
+        const targetInput = document.getElementById("searchValue");
+        const value = targetInput ? targetInput.value.trim() : "";
+
+        if (!value) {
+            alert("Por favor ingresa un número para buscar en el arreglo.");
+            return;
+        }
+    }
+
+    stopExecution = true;
+    await sleep(100);
     stopExecution = false;
 
-    // Cargar el archivo JS correspondiente
     let scriptPath = "";
     if ([
         "bubbleSort", "insertionSort", "selectionSort", "quickSort", "mergeSort", "heapSort"
@@ -115,10 +186,23 @@ document.getElementById("start").addEventListener("click", async () => {
 
     await loadAlgorithm(scriptPath);
 
-    if (typeof window[currentAlgorithm] === "function") {
-        await window[currentAlgorithm](currentArray);
-    } else {
+    if (typeof window[currentAlgorithm] !== "function") {
         alert("Algoritmo no implementado todavía");
+        return;
+    }
+
+    if (["linearSearch", "binarySearch"].includes(currentAlgorithm)) {
+        const input = document.getElementById("searchValue");
+        const target = Number(input?.value);
+
+        if (!Number.isFinite(target)) {
+            alert("Ingresa un número a buscar antes de iniciar.");
+            return;
+        }
+
+        await window[currentAlgorithm](currentArray, target);
+    } else {
+        await window[currentAlgorithm](currentArray);
     }
 });
 
@@ -136,102 +220,4 @@ function loadAlgorithm(path) {
 // Utilidad para pausas
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-// Variable global de la gráfica
-let complexityChart = null;
-
-// Mapeo entre nombre interno y nombre legible
-const mapping = {
-    bubbleSort: "Bubble Sort",
-    insertionSort: "Insertion Sort",
-    selectionSort: "Selection Sort",
-    mergeSort: "Merge Sort",
-    quickSort: "Quick Sort",
-    heapSort: "Heap Sort"
-};
-
-// Función que actualiza la gráfica al seleccionar un algoritmo
-function updateChart(algorithmName) {
-    const inputSizes = [10, 50, 100, 200, 500, 1000];
-    const algoKey = mapping[algorithmName] || algorithmName;
-    const algo = algorithmComplexities[algoKey];
-
-    if (!algo) return;
-
-    const ctx = document.getElementById("complexityChart").getContext("2d");
-
-    // 🔥 Destruir gráfica previa si ya existe
-    if (complexityChart) {
-        complexityChart.destroy();
-    }
-
-    // Colores por caso
-    const colors = {
-        "Mejor": "rgba(75, 192, 192, 0.7)",
-        "Promedio": "rgba(255, 205, 86, 0.7)",
-        "Peor": "rgba(255, 99, 132, 0.7)"
-    };
-    const borderColors = {
-        "Mejor": "rgba(75, 192, 192, 1)",
-        "Promedio": "rgba(255, 205, 86, 1)",
-        "Peor": "rgba(255, 99, 132, 1)"
-    };
-
-    // Crear datasets (uno por cada caso)
-    const datasets = Object.keys(colors).map(caseType => ({
-        label: caseType,
-        data: inputSizes.map(n => Math.round(algo[caseType](n))),
-        backgroundColor: colors[caseType],
-        borderColor: borderColors[caseType],
-        borderWidth: 2,
-        borderRadius: 6
-    }));
-
-    // Crear la gráfica
-    complexityChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: inputSizes,
-            datasets: datasets
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: `Complejidad de ${algoKey}`,
-                    font: {
-                        size: 20,
-                        weight: "bold"
-                    }
-                },
-                legend: {
-                    position: "top"
-                },
-                tooltip: {
-                    backgroundColor: "#222",
-                    titleColor: "#fff",
-                    bodyColor: "#ddd",
-                    padding: 10
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: "Tamaño de entrada (n)"
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: "Número de operaciones estimadas"
-                    }
-                }
-            }
-        }
-    });
 }
