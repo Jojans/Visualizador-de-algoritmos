@@ -16,7 +16,7 @@ Este visualizador permite comprender cómo funcionan los algoritmos paso a paso 
     - Quick Sort
     - Merge Sort
     - Heap Sort
-  - **Búsqueda** *(pendiente de integración)*:
+  - **Búsqueda**:
     - Búsqueda Lineal
     - Búsqueda Binaria
   - **Grafos** *(pendiente de integración)*:
