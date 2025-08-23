@@ -10,7 +10,7 @@ Este visualizador permite comprender cómo funcionan los algoritmos paso a paso 
 - 🎨 **Interfaz interactiva** con visualización en tiempo real.  
 - 🔍 **Algoritmos implementados**:
   - **Ordenamiento**:
-    - Bubble Sort ✅ *(algoritmo por defecto)*
+    - Bubble Sort
     - Insertion Sort
     - Selection Sort
     - Quick Sort
