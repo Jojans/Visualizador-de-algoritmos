@@ -24,9 +24,4 @@ Este visualizador permite comprender cómo funcionan los algoritmos paso a paso 
     - A* 
   - **Otros** *(pendiente de integración)*
 
-- 📊 **Comparación visual de complejidad**:
-  - Mejor caso
-  - Caso promedio
-  - Peor caso  
-
 - 🗂 **Persistencia de datos**: los arrays generados se guardan en memoria para reutilización.
