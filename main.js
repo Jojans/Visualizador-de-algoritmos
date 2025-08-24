@@ -1,6 +1,7 @@
 let currentArray = [];
+let currentTree = null;   // árbol para DFS/BFS
 let currentAlgorithm = "";
-let stopExecution = false; // <- bandera global
+let stopExecution = false; // bandera global
 
 // Diccionario con información de cada algoritmo
 const algorithmInfo = {
@@ -46,167 +47,240 @@ const algorithmInfo = {
     }
 };
 
-// Detectar página actual y establecer algoritmo por defecto
+/* ---------------------------
+   Helpers de UI
+--------------------------- */
+function isGraphAlgo(algo) {
+    return algo === "dfs" || algo === "bfs";
+}
+
+function updateAlgorithmInfo() {
+    if (!algorithmInfo[currentAlgorithm]) return;
+    const info = algorithmInfo[currentAlgorithm];
+    const box = document.getElementById("algorithm-info");
+    if (box) {
+        box.innerHTML = `
+            <p>${info.description}</p>
+            <p><strong>${info.complexity}</strong></p>
+        `;
+    }
+}
+
+// Muestra/oculta: botón Generar, input de búsqueda, sección de recorrido
+function updateUIVisibility() {
+    const generateBtn = document.getElementById("generate");
+    const searchInputContainer = document.getElementById("searchInputContainer");
+    const traversalSection = document.getElementById("traversalResult");
+
+    const graph = isGraphAlgo(currentAlgorithm);
+
+    if (generateBtn) {
+        // Usamos clase y style para evitar que otro CSS/JS lo “reviva”
+        generateBtn.classList.toggle("hidden", graph);
+        generateBtn.style.display = graph ? "none" : "inline-flex";
+    }
+    if (searchInputContainer) {
+        searchInputContainer.classList.toggle("hidden", graph);
+    }
+    if (traversalSection) {
+        traversalSection.classList.toggle("hidden", !graph);
+    }
+}
+
+/* ---------------------------
+   Arranque
+--------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
     const path = window.location.pathname;
 
     if (path.includes("ordenamiento")) {
-        currentAlgorithm = "bubbleSort";   // por defecto en ordenamiento
+        currentAlgorithm = "bubbleSort";
     } else if (path.includes("busqueda")) {
-        currentAlgorithm = "linearSearch"; // por defecto en búsqueda
+        currentAlgorithm = "linearSearch";
     } else {
-        currentAlgorithm = "";             // en otros, no seleccionamos nada
+        currentAlgorithm = "";
     }
 
-    // Forzar el valor en el select si existe
     const algoSelect = document.getElementById("algorithmSelect");
     if (algoSelect && currentAlgorithm) {
         algoSelect.value = currentAlgorithm;
     }
 
-    // Mostrar info inicial si aplica
-    if (algorithmInfo[currentAlgorithm]) {
-        const algo = algorithmInfo[currentAlgorithm];
-        document.getElementById("algorithm-info").innerHTML = `
-            <p>${algo.description}</p>
-            <p><strong>${algo.complexity}</strong></p>
-        `;
-    }
-});
+    updateAlgorithmInfo();
+    updateUIVisibility();
 
-// Detectar cambios en el select de algoritmos
-const algoSelect = document.getElementById("algorithmSelect");
-if (algoSelect) {
-    algoSelect.addEventListener("change", (e) => {
-        currentAlgorithm = e.target.value;
-
-        if (algorithmInfo[currentAlgorithm]) {
-            const algo = algorithmInfo[currentAlgorithm];
-            document.getElementById("algorithm-info").innerHTML = `
-                <p>${algo.description}</p>
-                <p><strong>${algo.complexity}</strong></p>
-            `;
-        }
-
-        // ✅ Ajustar array según algoritmo seleccionado
-        if (currentAlgorithm === "binarySearch") {
-            // Si ya había array, solo lo ordenamos
-            if (currentArray.length > 0) {
-                currentArray.sort((a, b) => a - b);
-            } else {
-                currentArray = generateArray();
-                currentArray.sort((a, b) => a - b);
-            }
-            saveArray(currentArray);
-            drawArray(currentArray);
-        } 
-        else if (["linearSearch", "bubbleSort", "insertionSort", "selectionSort", "quickSort", "mergeSort", "heapSort"].includes(currentAlgorithm)) {
-            // Solo generar nuevo array si no había
-            if (currentArray.length === 0) {
-                currentArray = generateArray();
-                saveArray(currentArray);
-                drawArray(currentArray);
-            }
-        }
-    });
-}
-
-// Al cargar la página, recupera datos guardados o genera nuevos
-window.onload = () => {
-    const savedArray = loadArray(); // de utils.js
-    if (savedArray) {
-        currentArray = savedArray;
-        // Si es binarySearch -> ordenar el recuperado
-        if (currentAlgorithm === "binarySearch") {
-            currentArray.sort((a, b) => a - b);
-        }
-    } else {
-        currentArray = generateArray();
+    // Cargar datos iniciales según tipo
+    if (isGraphAlgo(currentAlgorithm)) {
+        // Árbol
+        const savedTree = localStorage.getItem("treeStructure");
+        currentTree = savedTree ? JSON.parse(savedTree) : generateTreeData();
+        localStorage.setItem("treeStructure", JSON.stringify(currentTree));
+        drawTree(currentTree, document.getElementById("treeContainer"));
+    } else if (currentAlgorithm) {
+        // Array
+        const savedArray = loadArray();
+        currentArray = savedArray || generateArray();
         if (currentAlgorithm === "binarySearch") {
             currentArray.sort((a, b) => a - b);
         }
         saveArray(currentArray);
-    }
-    drawArray(currentArray);
-};
-
-// Generar datos iniciales solo si se oprime el botón
-document.getElementById("generate").addEventListener("click", () => {
-    stopExecution = true; // <- parar ejecución en curso
-    currentArray = generateArray();
-
-    if (currentAlgorithm === "binarySearch") {
-        currentArray.sort((a, b) => a - b);
+        drawArray(currentArray);
     }
 
-    saveArray(currentArray);
-    drawArray(currentArray);
+    // Cambio de algoritmo
+    if (algoSelect) {
+        algoSelect.addEventListener("change", (e) => {
+            currentAlgorithm = e.target.value;
+
+            updateAlgorithmInfo();
+            updateUIVisibility();
+
+            if (currentAlgorithm === "binarySearch") {
+                if (currentArray.length > 0) {
+                    currentArray.sort((a, b) => a - b);
+                } else {
+                    currentArray = generateArray();
+                    currentArray.sort((a, b) => a - b);
+                }
+                saveArray(currentArray);
+                drawArray(currentArray);
+            }
+            else if (["linearSearch", "bubbleSort", "insertionSort", "selectionSort", "quickSort", "mergeSort", "heapSort"].includes(currentAlgorithm)) {
+                if (currentArray.length === 0) {
+                    currentArray = generateArray();
+                    saveArray(currentArray);
+                }
+                drawArray(currentArray);
+            }
+            else if (isGraphAlgo(currentAlgorithm)) {
+                currentTree = generateTreeData();
+                localStorage.setItem("treeStructure", JSON.stringify(currentTree));
+                drawTree(currentTree, document.getElementById("arrayContainer"));
+            }
+        });
+    }
+
+    // Botón Generar (solo arrays)
+    const generateBtn = document.getElementById("generate");
+    if (generateBtn) {
+        generateBtn.addEventListener("click", () => {
+            stopExecution = true;
+
+            if (!isGraphAlgo(currentAlgorithm)) {
+                currentArray = generateArray();
+                if (currentAlgorithm === "binarySearch") {
+                    currentArray.sort((a, b) => a - b);
+                }
+                saveArray(currentArray);
+                drawArray(currentArray);
+            }
+        });
+    }
+
+    // Botón Iniciar
+    const startBtn = document.getElementById("start");
+    if (startBtn) {
+        startBtn.addEventListener("click", async () => {
+            if (!currentAlgorithm) {
+                alert("Selecciona un algoritmo primero");
+                return;
+            }
+
+            // Validación para búsquedas en array
+            if (window.location.pathname.includes("busqueda") &&
+                ["linearSearch", "binarySearch"].includes(currentAlgorithm)) {
+
+                const targetInput = document.getElementById("searchValue");
+                const value = targetInput ? targetInput.value.trim() : "";
+
+                if (!value) {
+                    alert("Por favor ingresa un número para buscar en el arreglo.");
+                    return;
+                }
+            }
+
+            stopExecution = true;
+            await sleep(100);
+            stopExecution = false;
+
+            // Para DFS/BFS usamos las funciones locales (animación en pantalla)
+            if (isGraphAlgo(currentAlgorithm)) {
+                const traversalContent = document.getElementById("traversalContent");
+                const tree = currentTree || generateTreeData();
+                const order = currentAlgorithm === "dfs" ? dfsTraversal(tree) : bfsTraversal(tree);
+
+                if (traversalContent) {
+                    traversalContent.innerHTML = "";
+
+                    for (let val of order) {
+                        const div = document.createElement("div");
+                        div.textContent = val;
+                        div.className = "px-4 py-2 rounded-lg bg-yellow-500 text-black font-bold shadow";
+                        traversalContent.appendChild(div);
+
+                        const nodeElement = document.getElementById(`node-${val}`);
+                        if (nodeElement) {
+                            nodeElement.classList.add("bg-yellow-500", "text-black", "font-bold");
+                        }
+
+                        await sleep(700);
+
+                        // Marcar como visitado
+                        div.classList.remove("bg-yellow-500");
+                        div.classList.add("bg-green-600", "text-white");
+
+                        if (nodeElement) {
+                            nodeElement.classList.remove("bg-yellow-500");
+                            nodeElement.classList.add("bg-green-600", "text-white");
+                        }
+                    }
+                }
+                return;
+            }
+
+            // Rutas para otros algoritmos (ordenamiento/búsqueda en array, grafos avanzados)
+            let scriptPath = "";
+            if (["bubbleSort", "insertionSort", "selectionSort", "quickSort", "mergeSort", "heapSort"].includes(currentAlgorithm)) {
+                scriptPath = `sorting/${currentAlgorithm}.js`;
+            }
+            else if (["linearSearch", "binarySearch"].includes(currentAlgorithm)) {
+                scriptPath = `searching/${currentAlgorithm}.js`;
+            }
+            else if (["dijkstra", "aStar"].includes(currentAlgorithm)) {
+                scriptPath = `graphs/${currentAlgorithm}.js`;
+            }
+            else {
+                scriptPath = `others/${currentAlgorithm}.js`;
+            }
+
+            await loadAlgorithm(scriptPath);
+
+            if (typeof window[currentAlgorithm] !== "function") {
+                alert("Algoritmo no implementado todavía");
+                return;
+            }
+
+            if (["linearSearch", "binarySearch"].includes(currentAlgorithm)) {
+                const input = document.getElementById("searchValue");
+                const target = Number(input?.value);
+
+                if (!Number.isFinite(target)) {
+                    alert("Ingresa un número a buscar antes de iniciar.");
+                    return;
+                }
+
+                await window[currentAlgorithm](currentArray, target);
+            }
+            else {
+                await window[currentAlgorithm](currentArray);
+            }
+        });
+    }
 });
 
-// Iniciar visualización
-document.getElementById("start").addEventListener("click", async () => {
-    if (!currentAlgorithm) {
-        alert("Selecciona un algoritmo primero");
-        return;
-    }
-
-    if (window.location.pathname.includes("busqueda")) {
-        const targetInput = document.getElementById("searchValue");
-        const value = targetInput ? targetInput.value.trim() : "";
-
-        if (!value) {
-            alert("Por favor ingresa un número para buscar en el arreglo.");
-            return;
-        }
-    }
-
-    stopExecution = true;
-    await sleep(100);
-    stopExecution = false;
-
-    let scriptPath = "";
-    if ([
-        "bubbleSort", "insertionSort", "selectionSort", "quickSort", "mergeSort", "heapSort"
-    ].includes(currentAlgorithm)) {
-        scriptPath = `sorting/${currentAlgorithm}.js`;
-    } 
-    else if ([
-        "linearSearch", "binarySearch", "bfs", "dfs"
-    ].includes(currentAlgorithm)) {
-        scriptPath = `searching/${currentAlgorithm}.js`;
-    } 
-    else if ([
-        "dijkstra", "aStar"
-    ].includes(currentAlgorithm)) {
-        scriptPath = `graphs/${currentAlgorithm}.js`;
-    } 
-    else {
-        scriptPath = `others/${currentAlgorithm}.js`;
-    }
-
-    await loadAlgorithm(scriptPath);
-
-    if (typeof window[currentAlgorithm] !== "function") {
-        alert("Algoritmo no implementado todavía");
-        return;
-    }
-
-    if (["linearSearch", "binarySearch"].includes(currentAlgorithm)) {
-        const input = document.getElementById("searchValue");
-        const target = Number(input?.value);
-
-        if (!Number.isFinite(target)) {
-            alert("Ingresa un número a buscar antes de iniciar.");
-            return;
-        }
-
-        await window[currentAlgorithm](currentArray, target);
-    } else {
-        await window[currentAlgorithm](currentArray);
-    }
-});
-
-// Cargar archivo de algoritmo dinámicamente
+/* ---------------------------
+   Carga dinámica y utilidades
+--------------------------- */
 function loadAlgorithm(path) {
     return new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -217,7 +291,6 @@ function loadAlgorithm(path) {
     });
 }
 
-// Utilidad para pausas
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

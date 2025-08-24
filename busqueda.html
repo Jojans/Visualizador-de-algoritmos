@@ -23,8 +23,11 @@
   <!-- HERO -->
   <header class="text-center py-20 bg-gradient-to-r from-green-700 to-blue-700">
     <h2 class="text-4xl font-bold">Algoritmos de Búsqueda</h2>
-    <p class="mt-4 text-lg text-gray-300">Explora cómo funcionan la búsqueda lineal, binaria y en grafos.</p>
-    <a href="index.html" class="mt-6 inline-block px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold rounded-lg shadow">
+    <p class="mt-4 text-lg text-gray-300">
+      Explora cómo funcionan la búsqueda lineal, binaria y en grafos.
+    </p>
+    <a href="index.html" 
+      class="mt-6 inline-block px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold rounded-lg shadow">
       ← Volver al Inicio
     </a>
   </header>
@@ -46,7 +49,8 @@
         Iniciar
       </button>
 
-      <div class="flex items-center gap-4">
+      <!-- Input para búsqueda (solo lineal y binaria) -->
+      <div id="searchInputContainer" class="flex items-center gap-4">
         <input id="searchValue" type="number" placeholder="Valor a buscar" class="px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white w-40">
       </div>
     </div>
@@ -54,6 +58,15 @@
 
   <!-- CONTENEDOR DE DATOS -->
   <div id="arrayContainer" class="flex justify-center mt-6"></div>
+
+  <!-- CONTENEDOR DEL ÁRBOL -->
+  <div id="treeContainer" class="flex justify-center mt-6 hidden"></div>
+
+  <!-- RESULTADO DE RECORRIDO (DFS / BFS) -->
+  <section id="traversalResult" class="max-w-2xl mx-auto mt-8 bg-gray-800 p-6 rounded-xl shadow-lg text-left hidden">
+    <h3 class="text-xl font-bold text-yellow-400 mb-2">Recorrido del algoritmo</h3>
+    <div id="traversalContent" class="flex flex-wrap gap-2 text-gray-300"></div>
+  </section>
 
   <!-- INFO DEL ALGORITMO -->
   <section class="max-w-2xl mx-auto mt-8 bg-gray-800 p-6 rounded-xl shadow-lg text-left">
@@ -72,6 +85,82 @@
   <script src="algorithmsInfo.js"></script>
   <script src="utils.js"></script>
   <script src="main.js"></script>
+
+  <script>
+    const select = document.getElementById("algorithmSelect");
+    const searchInputContainer = document.getElementById("searchInputContainer");
+    const traversalSection = document.getElementById("traversalResult");
+    const traversalContent = document.getElementById("traversalContent");
+    const startBtn = document.getElementById("start");
+
+    // Mostrar/ocultar input según algoritmo
+    select.addEventListener("change", () => {
+      if (select.value === "dfs" || select.value === "bfs") {
+        searchInputContainer.classList.add("hidden");
+        traversalSection.classList.remove("hidden");
+      } else {
+        searchInputContainer.classList.remove("hidden");
+        traversalSection.classList.add("hidden");
+      }
+    });
+
+    // DFS
+    function dfsTraversal(node, visited) {
+      if (!node) return;
+      visited.push(node.value);
+      dfsTraversal(node.left, visited);
+      dfsTraversal(node.right, visited);
+    }
+
+    // BFS
+    function bfsTraversal(tree) {
+      let visited = [];
+      let queue = [tree];
+      while (queue.length > 0) {
+        let node = queue.shift();
+        if (node) {
+          visited.push(node.value);
+          queue.push(node.left);
+          queue.push(node.right);
+        }
+      }
+      return visited;
+    }
+
+    // Animación de recorrido
+    async function animateTraversal(order) {
+      traversalContent.innerHTML = "";
+      for (let i = 0; i < order.length; i++) {
+        let div = document.createElement("div");
+        div.textContent = order[i];
+        div.className = "px-4 py-2 rounded-lg bg-yellow-500 text-black font-bold shadow";
+        traversalContent.appendChild(div);
+
+        // Efecto de animación
+        await new Promise(resolve => setTimeout(resolve, 700));
+        div.classList.remove("bg-yellow-500");
+        div.classList.add("bg-green-600", "text-white");
+      }
+    }
+
+    // Árbol de ejemplo
+    const exampleTree = {
+      value: 1,
+      left: { value: 2, left: { value: 4 }, right: { value: 5 } },
+      right: { value: 3, left: { value: 6 }, right: { value: 7 } }
+    };
+
+    startBtn.addEventListener("click", () => {
+      if (select.value === "dfs") {
+        let visited = [];
+        dfsTraversal(exampleTree, visited);
+        animateTraversal(visited);
+      } else if (select.value === "bfs") {
+        let visited = bfsTraversal(exampleTree);
+        animateTraversal(visited);
+      }
+    });
+  </script>
 
 </body>
 </html>

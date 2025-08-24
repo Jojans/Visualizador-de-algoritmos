@@ -71,3 +71,67 @@ function drawArray(...args) {
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/* -------------------------------
+   Árbol binario fijo para DFS/BFS
+--------------------------------- */
+function generateTreeData() {
+    return {
+        value: 1,
+        children: [
+            {
+                value: 2,
+                children: [
+                    { value: 4, children: [] },
+                    { value: 5, children: [] }
+                ]
+            },
+            {
+                value: 3,
+                children: [
+                    { value: 6, children: [] },
+                    { value: 7, children: [] }
+                ]
+            }
+        ]
+    };
+}
+
+/* -------------------------------
+   Dibujar árbol con IDs por nodo
+--------------------------------- */
+function drawTree(node, container = document.getElementById("treeContainer"), options = {}) {
+    const { highlighted = null, found = null, notFound = null } = options;
+    container.innerHTML = "";
+
+    function createNodeElement(node) {
+        const el = document.createElement("div");
+        el.classList.add("tree-node");
+        el.id = `node-${node.value}`; // ✅ ID único
+        el.textContent = node.value;
+
+        // 🎨 Colorear según estado
+        if (found === node.value) {
+            el.style.backgroundColor = "lightgreen"; // encontrado
+        } else if (notFound === node.value) {
+            el.style.backgroundColor = "tomato"; // no encontrado
+        } else if (highlighted === node.value) {
+            el.style.backgroundColor = "salmon"; // visitando
+        } else {
+            el.style.backgroundColor = "lightblue"; // inicial
+        }
+
+        if (node.children.length > 0) {
+            const childrenContainer = document.createElement("div");
+            childrenContainer.classList.add("tree-children");
+            node.children.forEach(child => {
+                childrenContainer.appendChild(createNodeElement(child));
+            });
+            el.appendChild(childrenContainer);
+        }
+
+        return el;
+    }
+
+    container.appendChild(createNodeElement(node));
+}
