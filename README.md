@@ -1,0 +1,27 @@
+# 🔢 Visualizador de Algoritmos
+
+Un proyecto interactivo para aprender y visualizar algoritmos de manera intuitiva y práctica.  
+Este visualizador permite comprender cómo funcionan los algoritmos paso a paso mediante animaciones y gráficas comparativas de complejidad.
+
+---
+
+## ✨ Características principales
+
+- 🎨 **Interfaz interactiva** con visualización en tiempo real.  
+- 🔍 **Algoritmos implementados**:
+  - **Ordenamiento**:
+    - Bubble Sort
+    - Insertion Sort
+    - Selection Sort
+    - Quick Sort
+    - Merge Sort
+    - Heap Sort
+  - **Búsqueda**:
+    - Búsqueda Lineal
+    - Búsqueda Binaria
+  - **Grafos** *(pendiente de integración)*:
+    - Dijkstra
+    - A* 
+  - **Otros** *(pendiente de integración)*
+
+- 🗂 **Persistencia de datos**: los arrays generados se guardan en memoria para reutilización.
