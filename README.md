@@ -1,6 +1,5 @@
 # 🔢 Visualizador de Algoritmos
 
-Un proyecto interactivo para aprender y visualizar algoritmos de manera intuitiva y práctica.  
 Este visualizador permite comprender cómo funcionan los algoritmos paso a paso mediante animaciones y gráficas comparativas de complejidad.
 
 ---
@@ -19,9 +18,8 @@ Este visualizador permite comprender cómo funcionan los algoritmos paso a paso 
   - **Búsqueda**:
     - Búsqueda Lineal
     - Búsqueda Binaria
+    - DFS
+    - BFS
   - **Grafos** *(pendiente de integración)*:
-    - Dijkstra
-    - A* 
+    
   - **Otros** *(pendiente de integración)*
-
-- 🗂 **Persistencia de datos**: los arrays generados se guardan en memoria para reutilización.
